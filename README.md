@@ -53,7 +53,11 @@ pip install numpy-quaternion==2022.4.3
 cd thirdparty/gtsam
 mkdir build
 cd build
-cmake .. -DGTSAM_BUILD_PYTHON=1 -DGTSAM_PYTHON_VERSION=3.10.11
+cmake .. \
+  -DGTSAM_BUILD_PYTHON=ON \
+  -DGTSAM_PYTHON_VERSION=3.10.11 \
+  -DCMAKE_CXX_STANDARD=17 \
+  -DCMAKE_CXX_FLAGS="-DPYBIND11_NAMESPACE=py"
 make python-install
 ```
 
