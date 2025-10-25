@@ -53,11 +53,30 @@ pip install numpy-quaternion==2022.4.3
 cd thirdparty/gtsam
 mkdir build
 cd build
+PY_INC=$(python -c 'import sysconfig; print(sysconfig.get_path("include"))')
+PY_LIB=$(python - <<'PY'
+import sysconfig, os
+libdir = sysconfig.get_config_var("LIBDIR")
+name   = "libpython"+sysconfig.get_config_var("LDVERSION")+".so"
+print(os.path.join(libdir, name))
+PY
+)
+P11_DIR=$(python - <<'PY'
+import pybind11, pathlib
+print(pathlib.Path(pybind11.__file__).parent/'share/cmake/pybind11')
+PY
+)
+
 cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
   -DGTSAM_BUILD_PYTHON=ON \
-  -DGTSAM_PYTHON_VERSION=3.10.11 \
-  -DCMAKE_CXX_STANDARD=17 \
-  -DCMAKE_CXX_FLAGS="-DPYBIND11_NAMESPACE=py"
+  -DGTSAM_PYTHON_VERSION=3.10 \
+  -DPython3_ROOT_DIR="$CONDA_PREFIX" \
+  -DPython3_EXECUTABLE="$(which python)" \
+  -DPython3_INCLUDE_DIR="$PY_INC" \
+  -DPython3_LIBRARY="$PY_LIB" \
+  -Dpybind11_DIR="$P11_DIR"
+
 make python-install
 ```
 
